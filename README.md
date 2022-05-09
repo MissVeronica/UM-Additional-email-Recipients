@@ -7,5 +7,6 @@ Tested with standard WP Mail and SMTP via the "Post SMTP Mailer/Email Log" Plugi
 https://wordpress.org/plugins/post-smtp/
 
 ## Installation
-Install by downloading the ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New.
+Install by downloading the ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
+
 Activate the Plugin: Ultimate Member - Additional Email Recipients
