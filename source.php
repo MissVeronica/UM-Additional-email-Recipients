@@ -1,11 +1,30 @@
 <?php
+/**
+ * Plugin Name:     Ultimate Member - Additional Email Recipients
+ * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails.
+ * Version:         1.0.0
+ * Requires PHP:    7.4
+ * Author:          Miss Veronica
+ * License:         GPL v2 or later
+ * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
+ * Author URI:      https://github.com/MissVeronica
+ * Text Domain:     ultimate-member
+ * Domain Path:     /languages
+ * UM version:      2.3.2
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit; 
+if ( ! class_exists( 'UM' ) ) return;
 
 
 add_filter( 'wp_mail', 'my_um_add_email_recipients', 10, 1 );
+add_action( 'um_before_email_notification_sending', 'my_um_add_email_recipients_setup', 10, 3 );
+add_filter( 'um_admin_settings_email_section_fields', 'um_admin_settings_email_section_fields_custom', 10, 2 );
 
 function my_um_add_email_recipients( $args ) {
-
+    
     $template = get_transient( "my_um_email_recipients_template_" . $args['to'] );
+    
     if( !empty( $template )) {
         delete_transient( "my_um_email_recipients_template_" . $args['to'] );
 
@@ -13,6 +32,7 @@ function my_um_add_email_recipients( $args ) {
         foreach( $email_options as $option => $carbon_copy ) {
 
             $emails = UM()->options()->get( $template . $option );            
+            
             if( !empty( $emails )) {
                 
                 $emails = explode( ',', $emails );                
@@ -35,8 +55,6 @@ function my_um_add_email_recipients( $args ) {
     return $args;
 }
 
-add_filter( 'um_admin_settings_email_section_fields', 'um_admin_settings_email_section_fields_custom', 10, 2 );
-
 function um_admin_settings_email_section_fields_custom( $section_fields, $email_key ) {
 
     $section_fields[] = array(
@@ -58,11 +76,10 @@ function um_admin_settings_email_section_fields_custom( $section_fields, $email_
     return $section_fields;
 }
 
-add_action( 'um_before_email_notification_sending', 'my_um_add_email_recipients_setup', 10, 3 );
-
 function my_um_add_email_recipients_setup( $email, $template, $args ) {
 
     if( !empty( $email ) && !empty( $template ) ) {
         set_transient( "my_um_email_recipients_template_" . $email, $template, 60 );
     }
 }
+
