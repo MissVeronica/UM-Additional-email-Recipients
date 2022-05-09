@@ -7,7 +7,4 @@ Tested with standard WP Mail and SMTP via the "Post SMTP Mailer/Email Log" Plugi
 https://wordpress.org/plugins/post-smtp/
 
 ## Installation
-Install by adding the file source.php to your child-theme’s functions.php file
-or use the “Code Snippets” Plugin
-
-https://wordpress.org/plugins/code-snippets/
+Install by downloading the ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New.
