@@ -8,3 +8,4 @@ https://wordpress.org/plugins/post-smtp/
 
 ## Installation
 Install by downloading the ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New.
+Activate the Plugin: Ultimate Member - Additional Email Recipients
