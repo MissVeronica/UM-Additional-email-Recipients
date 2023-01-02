@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Additional Email Recipients
  * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails.
- * Version:         1.0.0
+ * Version:         1.2.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -50,6 +50,15 @@ function my_um_add_email_recipients( $args ) {
                 }
             }
         }
+
+        $replace_email = UM()->options()->get( $template . '_custom_replace_email' );
+        if( !empty( $replace_email )) {
+
+            $replace_email = filter_var( sanitize_email( $replace_email ), FILTER_VALIDATE_EMAIL );
+            if( !empty( $replace_email )) {
+                $args['to'] = $replace_email;
+            }
+        }
     }
 
     return $args;
@@ -73,6 +82,14 @@ function um_admin_settings_email_section_fields_custom( $section_fields, $email_
             'tooltip'       => __( 'Comma separated e-mail adresses', 'ultimate-member' )
             );
 
+    $section_fields[] = array(
+            'id'            => $email_key . '_custom_replace_email',
+            'type'          => 'text',
+            'label'         => __( 'Replace UM User email with this address', 'ultimate-member' ),
+            'conditional'   => array( $email_key . '_on', '=', 1 ),
+            'tooltip'       => __( 'Replacement e-mail address instead of UM User email', 'ultimate-member' )
+            );
+    
     return $section_fields;
 }
 
