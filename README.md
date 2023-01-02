@@ -7,7 +7,7 @@ Tested with standard WP Mail and SMTP via the "Post SMTP Mailer/Email Log" Plugi
 https://wordpress.org/plugins/post-smtp/
 
 ## Updates
-Version 1.2.0 Replacement of User email with a default e-mail address added in settings for each notification email.
+Version 1.2.0 Replacement of User email with a default e-mail address added in UM Email Settings for each notification email.
 
 ## Installation
 Install by downloading the ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
