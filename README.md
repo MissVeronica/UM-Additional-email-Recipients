@@ -1,7 +1,7 @@
 # UM Additional email Recipients
 Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on meta field values.
 
-This code snippet will add setting fields to each UM email Notification setup for the admin user to add a comma separated email address list for email CC: and BCC: included with the UM Notification email. Updated versions adds replacement email from address and meta key field value to select additional CC: email adresses.
+This code snippet will add setting fields to each UM email Notification setup for the admin user to add a comma separated email address list for email CC: and BCC: included with the UM Notification email. Updated versions adds replacement email to address and meta key field value to select additional CC: email adresses.
 
 Tested with standard WP Mail and SMTP via the "Post SMTP Mailer/Email Log" Plugin:
 https://wordpress.org/plugins/post-smtp/
