@@ -9,6 +9,7 @@ https://wordpress.org/plugins/post-smtp/
 ## Updates
 1. Version 1.2.0 Replacement of User email with a default e-mail address added in UM Email Settings for each notification email.
 2. Version 2.0.0 Addition of a meta_key field value to select additional CC: email adresses where field value and email adress are : separated and one pair per line.
+3. Version 2.1.0 Bug fixing
 
 ## Installation
 Install by downloading the ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
