@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Additional Email Recipients
  * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on meta field values.
- * Version:         2.0.0
+ * Version:         2.1.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -20,6 +20,7 @@ if ( ! class_exists( 'UM' ) ) return;
 class UM_Additional_Email_Recipients {
 
     public $template = '';
+    public $registration_user_id = '';
     public $email_options = array( '_custom_cc'  => 'cc: ', 
                                    '_custom_bcc' => 'Bcc: ' );
 
@@ -27,38 +28,37 @@ class UM_Additional_Email_Recipients {
 
         add_filter( 'wp_mail',                                array( $this, 'my_um_add_email_recipients' ), 10, 1 );
         add_action( 'um_before_email_notification_sending',   array( $this, 'my_um_add_email_recipients_setup' ), 10, 3 );
-        add_filter( 'um_admin_settings_email_section_fields', array( $this, 'um_admin_settings_email_section_fields_custom' ), 10, 2 );
+        add_filter( 'um_admin_settings_email_section_fields', array( $this, 'um_admin_settings_email_section_email_recipients' ), 10, 2 );
+        add_action( 'um_registration_set_extra_data',         array( $this, 'um_registration_set_extra_data_email_recipients' ), 10, 2 );        
     }
 
     public function my_um_add_email_recipients( $args ) {
 
-        if ( ! empty( $this->template )) {
+        if ( ! empty( $this->template ) && ! empty( $this->registration_user_id )) {
 
             $custom_meta_key = trim( sanitize_text_field( UM()->options()->get( $this->template . '_custom_meta_key' )));
             $custom_email = '';
 
             if ( ! empty( $custom_meta_key )) {
 
-                $userinfo = get_user_by( 'email', $args['to'] );
-                if ( ! empty( $userinfo )) {
+                um_fetch_user( $this->registration_user_id );
+                $form_field_value = um_user( $custom_meta_key );
 
-                    um_fetch_user( $userinfo->ID );
-                    $form_field_value = um_user( $custom_meta_key );
-                    if ( ! empty( $form_field_value )) {
+                if ( ! empty( $form_field_value )) {
 
-                        $custom_meta_key_emails = array_map( 'trim', explode( "\n", UM()->options()->get( $this->template . '_custom_meta_key_emails' )));
-                        if ( is_array( $custom_meta_key_emails )) {
+                    $custom_meta_key_emails = array_map( 'trim', explode( "\n", UM()->options()->get( $this->template . '_custom_meta_key_emails' )));
 
-                            foreach( $custom_meta_key_emails as $custom_meta_key_email ) {
-                                $field_email_pair = array_map( 'trim', explode( ':', $custom_meta_key_email ));
+                    if ( is_array( $custom_meta_key_emails )) {
 
-                                if( $field_email_pair[0] == $form_field_value ) {
+                        foreach( $custom_meta_key_emails as $custom_meta_key_email ) {
+                            $field_email_pair = array_map( 'trim', explode( ':', $custom_meta_key_email ));
 
-                                    if ( ! empty( $field_email_pair[1] )) {
-                                        $custom_email = $field_email_pair[1];
-                                    }
-                                    break;
+                            if( $field_email_pair[0] == $form_field_value ) {
+
+                                if ( ! empty( $field_email_pair[1] )) {
+                                    $custom_email = $field_email_pair[1];
                                 }
+                                break;
                             }
                         }
                     }
@@ -109,7 +109,7 @@ class UM_Additional_Email_Recipients {
         return $args;
     }
 
-    public function um_admin_settings_email_section_fields_custom( $section_fields, $email_key ) {
+    public function um_admin_settings_email_section_email_recipients( $section_fields, $email_key ) {
 
         $section_fields[] = array(
                     'id'            => $email_key . '_custom_cc',
@@ -162,6 +162,11 @@ class UM_Additional_Email_Recipients {
 
             $this->template = $template;
         }
+    }
+
+    public function um_registration_set_extra_data_email_recipients( $user_id, $args ) {
+
+        $this->registration_user_id = $user_id;
     }
 
 }
