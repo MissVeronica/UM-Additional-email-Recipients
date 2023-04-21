@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Additional Email Recipients
  * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on meta field values.
- * Version:         2.1.0
+ * Version:         2.2.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -10,7 +10,7 @@
  * Author URI:      https://github.com/MissVeronica
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.3.2
+ * UM version:      2.6.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
@@ -26,13 +26,17 @@ class UM_Additional_Email_Recipients {
 
     function __construct() {
 
-        add_filter( 'wp_mail',                                array( $this, 'my_um_add_email_recipients' ), 10, 1 );
-        add_action( 'um_before_email_notification_sending',   array( $this, 'my_um_add_email_recipients_setup' ), 10, 3 );
+        add_filter( 'wp_mail',                                array( $this, 'um_add_email_recipients_wp_mail' ), 10, 1 );
+        add_action( 'um_before_email_notification_sending',   array( $this, 'um_add_email_recipients_setup' ), 10, 3 );
         add_filter( 'um_admin_settings_email_section_fields', array( $this, 'um_admin_settings_email_section_email_recipients' ), 10, 2 );
-        add_action( 'um_registration_set_extra_data',         array( $this, 'um_registration_set_extra_data_email_recipients' ), 10, 2 );        
+        add_action( 'um_registration_set_extra_data',         array( $this, 'um_registration_set_extra_data_email_recipients' ), 10, 2 );
+        add_action( 'um_user_pre_updating_profile',           array( $this, 'um_user_pre_updating_profile_email_recipients' ), 10, 2 );
+        add_action( 'um_when_status_is_set',                  array( $this, 'um_when_status_is_set_email_recipients' ), 10, 1 );
+        add_action( 'um_account_pre_update_profile',          array( $this, 'um_user_pre_updating_profile_email_recipients' ), 10, 2 ); 
+
     }
 
-    public function my_um_add_email_recipients( $args ) {
+    public function um_add_email_recipients_wp_mail( $args ) {
 
         if ( ! empty( $this->template ) && ! empty( $this->registration_user_id )) {
 
@@ -69,7 +73,7 @@ class UM_Additional_Email_Recipients {
 
                 $emails = trim( UM()->options()->get( $this->template . $option ));
 
-                if ( $option == '_custom_cc' ) {
+                if ( $option == '_custom_cc' && ! empty( $custom_email )) {
                     if ( ! empty( $emails )) {
                         $emails .= ',';
                     }
@@ -156,11 +160,14 @@ class UM_Additional_Email_Recipients {
         return $section_fields;
     }
 
-    public function my_um_add_email_recipients_setup( $email, $template, $args ) {
+    public function um_add_email_recipients_setup( $email, $template, $args ) {
 
         if ( ! empty( $email ) && ! empty( $template ) ) {
 
             $this->template = $template;
+            if ( empty( $this->registration_user_id ) && ! empty( um_user( 'ID' ) )) {
+                $this->registration_user_id = um_user( 'ID' );
+            }
         }
     }
 
@@ -169,7 +176,18 @@ class UM_Additional_Email_Recipients {
         $this->registration_user_id = $user_id;
     }
 
+    public function um_user_pre_updating_profile_email_recipients( $to_update, $user_id ) {
+
+        $this->registration_user_id = $user_id;
+    }
+
+    public function um_when_status_is_set_email_recipients( $user_id ) {
+
+        $this->registration_user_id = $user_id;
+    }
+
 }
 
 new UM_Additional_Email_Recipients();
+
 
