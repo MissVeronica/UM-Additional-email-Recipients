@@ -4,7 +4,7 @@ Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emai
 ## Functions for all active UM Notification emails
 1. The code snippet will add setting fields for the admin user to add a comma separated email address list for email CC: and BCC: to be included with the UM Notification email.
 2. Set a replacement email address for the user's email address.
-3. A dropdown meta key field value to use for selecting one address from additional list of CC: email adresses where field value and email adress are : separated and one pair per line.
+3. A dropdown meta key field value to use for selecting one email address list from additional list of CC: email adresses where field value and email adresses are : separated and one list per line. Email list must be comma separated like value:email1@address.com,email2@address.com
 
 ## Mail tests
 1. Tested with standard WP Mail and SMTP via the "Post SMTP Mailer/Email Log" Plugin:
