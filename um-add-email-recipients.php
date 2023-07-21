@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Additional Email Recipients
  * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on meta field values.
- * Version:         2.2.0
+ * Version:         2.3.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -10,7 +10,7 @@
  * Author URI:      https://github.com/MissVeronica
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.6.0
+ * UM version:      2.6.8
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
@@ -40,12 +40,13 @@ class UM_Additional_Email_Recipients {
 
         if ( ! empty( $this->template ) && ! empty( $this->registration_user_id )) {
 
+            um_fetch_user( $this->registration_user_id );
+
             $custom_meta_key = trim( sanitize_text_field( UM()->options()->get( $this->template . '_custom_meta_key' )));
             $custom_email = '';
 
             if ( ! empty( $custom_meta_key )) {
 
-                um_fetch_user( $this->registration_user_id );
                 $form_field_value = um_user( $custom_meta_key );
 
                 if ( ! empty( $form_field_value )) {
@@ -61,6 +62,7 @@ class UM_Additional_Email_Recipients {
 
                                 if ( ! empty( $field_email_pair[1] )) {
                                     $custom_email = $field_email_pair[1];
+                                    // possible to have a comma separated email list
                                 }
                                 break;
                             }
@@ -101,11 +103,19 @@ class UM_Additional_Email_Recipients {
             }
 
             $replace_email = trim( UM()->options()->get( $this->template . '_custom_replace_email' ));
-            if ( ! empty( $replace_email )) {
 
-                $replace_email = filter_var( sanitize_email( $replace_email ), FILTER_VALIDATE_EMAIL );
+            if ( ! empty( $replace_email ) && ! empty( um_user( $replace_email ) )) {
+
+                $replace_email = filter_var( sanitize_email( um_user( $replace_email ) ), FILTER_VALIDATE_EMAIL );
                 if ( ! empty( $replace_email )) {
-                    $args['to'] = $replace_email;
+
+                    if ( UM()->options()->get( $this->template . '_custom_replace_email_both' ) == 1 ) {
+                        $args['to'] = implode( ', ', array( $args['to'], $replace_email ));
+
+                    } else {
+                    
+                        $args['to'] = $replace_email;
+                    }
                 }
             }
         }
@@ -134,9 +144,18 @@ class UM_Additional_Email_Recipients {
         $section_fields[] = array(
                     'id'            => $email_key . '_custom_replace_email',
                     'type'          => 'text',
-                    'label'         => __( 'Additional Email Recipients - Replacement UM User email address', 'ultimate-member' ),
+                    'size'          => 'small',
+                    'label'         => __( 'Additional Email Recipients - Extra UM User email address', 'ultimate-member' ),
+                    'tooltip'       => __( 'Extra e-mail address meta_key to be used instead of UM User email', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
-                    'tooltip'       => __( 'Replacement e-mail address instead of UM User email', 'ultimate-member' )
+                );
+       
+        $section_fields[] = array(
+                    'id'            => $email_key . '_custom_replace_email_both',
+                    'type'          => 'checkbox',
+                    'label'         => __( 'Additional Email Recipients - Send to both Extra and UM User email address', 'ultimate-member' ),
+                    'tooltip'       => __( 'Click to send to both Extra e-mail and UM User email address', 'ultimate-member' ),
+                    'conditional'   => array( $email_key . '_on', '=', 1 ),
                 );
 
         $section_fields[] = array(
@@ -144,8 +163,8 @@ class UM_Additional_Email_Recipients {
                     'type'          => 'text',
                     'size'          => 'small',
                     'label'         => __( 'Additional Email Recipients - Meta Key for Field additional cc: email', 'ultimate-member' ),
+                    'tooltip'       => __( 'Enter the meta_key name for Form field value dependent for an additional cc: email', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
-                    'tooltip'       => __( 'Enter the meta_key name for Form field value dependent for an additional cc: email', 'ultimate-member' )
                 );
 
         $section_fields[] = array(
@@ -153,8 +172,8 @@ class UM_Additional_Email_Recipients {
                     'type'          => 'textarea',
                     'size'          => 'medium',
                     'label'         => __( 'Additional Email Recipients - Form Field value : Email address', 'ultimate-member' ),
+                    'tooltip'       => __( 'Enter the relation for Form field values for an additional cc: email address colon separated and one pair per line', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
-                    'tooltip'       => __( 'Enter the relation for Form field values for an additional cc: email address colon separated and one pair per line', 'ultimate-member' )
                 );
 
         return $section_fields;
@@ -189,5 +208,4 @@ class UM_Additional_Email_Recipients {
 }
 
 new UM_Additional_Email_Recipients();
-
 
