@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Additional Email Recipients
  * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on meta field values.
- * Version:         2.3.0
+ * Version:         3.0.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -10,7 +10,7 @@
  * Author URI:      https://github.com/MissVeronica
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.6.8
+ * UM version:      2.8.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
@@ -21,7 +21,7 @@ class UM_Additional_Email_Recipients {
 
     public $template = '';
     public $registration_user_id = '';
-    public $email_options = array( '_custom_cc'  => 'cc: ', 
+    public $email_options = array( '_custom_cc'  => 'cc: ',
                                    '_custom_bcc' => 'Bcc: ' );
 
     function __construct() {
@@ -32,7 +32,7 @@ class UM_Additional_Email_Recipients {
         add_action( 'um_registration_set_extra_data',         array( $this, 'um_registration_set_extra_data_email_recipients' ), 10, 2 );
         add_action( 'um_user_pre_updating_profile',           array( $this, 'um_user_pre_updating_profile_email_recipients' ), 10, 2 );
         add_action( 'um_when_status_is_set',                  array( $this, 'um_when_status_is_set_email_recipients' ), 10, 1 );
-        add_action( 'um_account_pre_update_profile',          array( $this, 'um_user_pre_updating_profile_email_recipients' ), 10, 2 ); 
+        add_action( 'um_account_pre_update_profile',          array( $this, 'um_user_pre_updating_profile_email_recipients' ), 10, 2 );
 
     }
 
@@ -102,6 +102,35 @@ class UM_Additional_Email_Recipients {
                 }
             }
 
+            $role_emails = trim( sanitize_text_field( UM()->options()->get( $this->template . '_custom_role_emails' )));
+     
+            if ( ! empty( $role_emails )) {
+
+                $email_list = get_users( array(
+                                    'fields'   => array( 'ID', 'user_email' ),
+                                    'role__in' => array( $role_emails ),
+                            ) );
+
+                $carbon_copy = $this->email_options['_custom_cc'];
+                if ( UM()->options()->get( $this->template . '_custom_role_bcc' ) == 1 ) {
+                    $carbon_copy = $this->email_options['_custom_bcc'];
+                }
+
+                foreach( $email_list as $email ) {
+
+                    if ( ! empty( $email->user_email )) {
+
+                        if ( is_array( $args['headers'] )) {
+                            $args['headers'][] = $carbon_copy . $email->user_email;
+
+                        } else {
+
+                            $args['headers'] .= $carbon_copy . $email->user_email . "\r\n";
+                        }
+                    }
+                }
+            }
+
             $replace_email = trim( UM()->options()->get( $this->template . '_custom_replace_email' ));
 
             if ( ! empty( $replace_email ) && ! empty( um_user( $replace_email ) )) {
@@ -113,7 +142,7 @@ class UM_Additional_Email_Recipients {
                         $args['to'] = implode( ', ', array( $args['to'], $replace_email ));
 
                     } else {
-                    
+
                         $args['to'] = $replace_email;
                     }
                 }
@@ -124,6 +153,14 @@ class UM_Additional_Email_Recipients {
     }
 
     public function um_admin_settings_email_section_email_recipients( $section_fields, $email_key ) {
+
+        global $wp_roles;
+
+        $role_options = array( '' => '' );
+
+        foreach ( $wp_roles->roles as $key => $value ) {
+            $role_options[$key] = $value['name'];
+        }
 
         $section_fields[] = array(
                     'id'            => $email_key . '_custom_cc',
@@ -149,7 +186,7 @@ class UM_Additional_Email_Recipients {
                     'tooltip'       => __( 'Extra e-mail address meta_key to be used instead of UM User email', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
                 );
-       
+
         $section_fields[] = array(
                     'id'            => $email_key . '_custom_replace_email_both',
                     'type'          => 'checkbox',
@@ -173,6 +210,24 @@ class UM_Additional_Email_Recipients {
                     'size'          => 'medium',
                     'label'         => __( 'Additional Email Recipients - Form Field value : Email address', 'ultimate-member' ),
                     'tooltip'       => __( 'Enter the relation for Form field values for an additional cc: email address colon separated and one pair per line', 'ultimate-member' ),
+                    'conditional'   => array( $email_key . '_on', '=', 1 ),
+                );
+
+        $section_fields[] = array(
+                    'id'            => $email_key . '_custom_role_emails',
+                    'type'          => 'select',
+                    'size'          => 'medium',
+                    'options'       => $role_options,
+                    'label'         => __( 'Additional Email Recipients - Users with Role', 'ultimate-member' ),
+                    'tooltip'       => __( 'Select one Role name for additional cc: email.', 'ultimate-member' ),
+                    'conditional'   => array( $email_key . '_on', '=', 1 ),
+                );
+
+        $section_fields[] = array(
+                    'id'            => $email_key . '_custom_role_bcc',
+                    'type'          => 'checkbox',
+                    'label'         => __( 'Additional Email Recipients - Users with Role Bcc:', 'ultimate-member' ),
+                    'tooltip'       => __( 'Click to send to Users with selected Role as Bcc: email, unclick for cc: email', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
                 );
 
