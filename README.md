@@ -1,14 +1,15 @@
 # UM Additional email Recipients
 Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on a meta field value.
 
-## UM Settings
-All settings at each UM Settings -> Email -> Email template
+## UM Settings - All settings at each UM Settings -> Email -> Email template
 1. Additional Email Recipients - cc: - Comma separated e-mail adresses
 2. Additional Email Recipients - Bcc: - Comma separated e-mail adresses
 3. Additional Email Recipients - Extra UM User email address - Extra e-mail address meta_key to be used instead of UM User email
 4. Additional Email Recipients - Send to both Extra and UM User email address - Click to send to both Extra e-mail and UM User email address
 5. Additional Email Recipients - Meta Key for Field additional cc: email - Enter the meta_key name for Form field value dependent for an additional cc: email
 6. Additional Email Recipients - Form Field value : Email address - Enter the relation for Form field values for an additional cc: email address colon separated and one pair per line
+7. Additional Email Recipients - Users with Role - Select one Role name for additional cc: or Bcc: email.
+8. Additional Email Recipients - Users with Role Bcc: - Click to send to Users with selected Role as Bcc: email, unclick for cc: email
 
 ## Functions for all active UM Notification emails
 1. Settings number 1 and 2 for adding cc: and Bcc: emails.
@@ -25,6 +26,7 @@ All settings at each UM Settings -> Email -> Email template
 3. Version 2.1.0 Bug fixing
 4. Version 2.2.0 Bug fixing
 5. Version 2.3.0 Addition of chackbox for usage of "Extra UM User email address"
+6. Version 3.0.0 Addition of cc: or Bcc: email to all Users with a selected Role.
 
 ## Installation
 1. Install by downloading the plugin ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
