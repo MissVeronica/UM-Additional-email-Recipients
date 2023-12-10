@@ -219,7 +219,7 @@ class UM_Additional_Email_Recipients {
                     'size'          => 'medium',
                     'options'       => $role_options,
                     'label'         => __( 'Additional Email Recipients - Users with Role', 'ultimate-member' ),
-                    'tooltip'       => __( 'Select one Role name for additional cc: email.', 'ultimate-member' ),
+                    'tooltip'       => __( 'Select one Role name for additional cc: or Bcc: email.', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
                 );
 
