@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Additional Email Recipients
  * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on meta field values.
- * Version:         3.2.0
+ * Version:         3.3.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -10,7 +10,7 @@
  * Author URI:      https://github.com/MissVeronica
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.8.3
+ * UM version:      2.8.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
@@ -21,19 +21,53 @@ class UM_Additional_Email_Recipients {
 
     public $template = '';
     public $registration_user_id = '';
-    public $email_options = array( '_custom_cc'  => 'cc: ',
-                                   '_custom_bcc' => 'Bcc: ' );
+
+    public $email_options    = array( '_custom_cc'  => 'cc: ',
+                                      '_custom_bcc' => 'Bcc: ',
+                                    );
+
+    public $admin_recipients = array();
 
     function __construct() {
 
         add_filter( 'wp_mail',                                array( $this, 'um_add_email_recipients_wp_mail' ), 10, 1 );
         add_action( 'um_before_email_notification_sending',   array( $this, 'um_add_email_recipients_setup' ), 10, 3 );
+        add_action( 'um_before_email_notification_sending',   array( $this, 'um_email_notification_add_reply_to' ), 12, 3 );
         add_filter( 'um_admin_settings_email_section_fields', array( $this, 'um_admin_settings_email_section_email_recipients' ), 10, 2 );
         add_action( 'um_registration_set_extra_data',         array( $this, 'um_registration_set_extra_data_email_recipients' ), 10, 2 );
         add_action( 'um_user_pre_updating_profile',           array( $this, 'um_user_pre_updating_profile_email_recipients' ), 10, 2 );
         add_action( 'um_when_status_is_set',                  array( $this, 'um_when_status_is_set_email_recipients' ), 10, 1 );
         add_action( 'um_account_pre_update_profile',          array( $this, 'um_user_pre_updating_profile_email_recipients' ), 10, 2 );
+        add_action( 'um_account_pre_update_profile',          array( $this, 'um_account_pre_update_profile_send_extra_email' ), 10, 2 );
+        add_filter( 'um_email_notifications',                 array( $this, 'um_email_get_notifications_add_reply_to' ), 999, 1 );
+    }
 
+    public function um_email_notification_add_reply_to( $email, $template, $args ) {
+	
+        if ( in_array( $template, $this->admin_recipients ) && UM()->options()->get( $template . '_add_reply_to' ) == 1 ) {
+            add_filter( 'wp_mail', array( $this, 'custom_email_notification_add_reply_to' ), 10, 1 );
+        }
+    }
+
+    public function custom_email_notification_add_reply_to( $args ) {
+
+        if ( $args['to'] != um_user( 'user_email' ) && ! empty( um_user( 'user_email' ) )) {
+            $args['headers'] .= 'Reply-To: ' . um_user( 'user_login' ) . ' <' . um_user( 'user_email' ) . ">\r\n";
+        }
+
+        return $args;
+    }
+
+    public function um_email_get_notifications_add_reply_to( $email_notifications ) {
+
+        foreach( $email_notifications as $email_key => $email_notification ) {
+
+            if ( $email_notification['recipient'] == 'admin' && $email_key != 'suspicious-activity' ) {
+                $this->admin_recipients[] = $email_key;
+            }
+        }
+
+        return $email_notifications;
     }
 
     public function um_add_email_recipients_wp_mail( $args ) {
@@ -153,6 +187,16 @@ class UM_Additional_Email_Recipients {
         return $args;
     }
 
+    public function um_account_pre_update_profile_send_extra_email( $changes, $user_id ) {
+
+        if ( UM()->options()->get( 'changedaccount_email_pre_update_profile' ) == 1 ) {
+            if ( um_user( 'user_email' ) != $changes['user_email'] && ! empty( um_user( 'user_email' ) )) {
+
+                UM()->mail()->send( um_user( 'user_email' ), 'changedaccount_email' );
+            }
+        }
+    }
+
     public function um_admin_settings_email_section_email_recipients( $section_fields, $email_key ) {
 
         global $wp_roles;
@@ -166,7 +210,7 @@ class UM_Additional_Email_Recipients {
                     'type'          => 'text',
                     'label'         => __( 'Additional Email Recipients - cc:', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
-                    'description'   => __( 'Comma separated e-mail adresses', 'ultimate-member' )
+                    'description'   => __( 'Comma separated email adresses', 'ultimate-member' )
                 );
 
         $section_fields[] = array(
@@ -174,7 +218,7 @@ class UM_Additional_Email_Recipients {
                     'type'          => 'text',
                     'label'         => __( 'Additional Email Recipients - Bcc:', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
-                    'description'   => __( 'Comma separated e-mail adresses', 'ultimate-member' )
+                    'description'   => __( 'Comma separated email adresses', 'ultimate-member' )
                 );
 
         $section_fields[] = array(
@@ -231,6 +275,28 @@ class UM_Additional_Email_Recipients {
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
                 );
 
+        if ( $email_key == 'changedaccount_email' ) {
+
+            $section_fields[] = array(
+                    'id'            => 'changedaccount_email_pre_update_profile',
+                    'type'          => 'checkbox',
+                    'label'         => __( 'Additional Email Recipients - Account page User\'s email address update', 'ultimate-member' ),
+                    'description'   => __( 'Click to also send email to the User\'s old email address when email is changed at the Account page.', 'ultimate-member' ),
+                    'conditional'   => array( $email_key . '_on', '=', 1 ),
+                );
+        }
+
+        if ( in_array( $email_key, $this->admin_recipients )) {
+
+            $section_fields[] = array(
+                    'id'            => $email_key . '_add_reply_to',
+                    'type'          => 'checkbox',
+                    'label'         => __( 'Additional Email Recipients - Add an email "Reply to" address', 'ultimate-member' ),
+                    'description'   => __( 'Click to add the User\'s email address and user_login name as the "Reply to" address', 'ultimate-member' ),
+                    'conditional'   => array( $email_key . '_on', '=', 1 ),
+                );
+        }
+
         return $section_fields;
     }
 
@@ -263,4 +329,5 @@ class UM_Additional_Email_Recipients {
 }
 
 new UM_Additional_Email_Recipients();
+
 
