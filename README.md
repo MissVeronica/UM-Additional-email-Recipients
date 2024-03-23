@@ -10,8 +10,8 @@ Account page user updated email address may get an email also to the old address
 ## UM Settings - All settings at each UM Settings -> Email -> Email template
 1. Additional Email Recipients - cc: - Comma separated e-mail adresses
 2. Additional Email Recipients - Bcc: - Comma separated e-mail adresses
-3. Additional Email Recipients - Extra UM User email address - Extra e-mail address meta_key to be used instead of UM User email
-4. Additional Email Recipients - Send to both Extra and UM User email address - Click to send to both Extra e-mail and UM User email address
+3. Additional Email Recipients - Extra UM User email address - Extra email address meta_key to be used instead of UM User email
+4. Additional Email Recipients - Send to both Extra and UM User email address - Click to send to both Extra email and UM User email address
 5. Additional Email Recipients - Meta Key for Field additional cc: email - Enter the meta_key name for Form field value dependent for an additional cc: email
 6. Additional Email Recipients - Form Field value : Email address - Enter the relation for Form field values for an additional cc: email address colon separated and one pair per line
 7. Additional Email Recipients - Users with Roles - Select the Role names for additional cc: or Bcc: emails.
