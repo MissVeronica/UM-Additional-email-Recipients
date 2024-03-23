@@ -1,5 +1,11 @@
 # UM Additional email Recipients
-Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on a meta field value. Addition of cc: or Bcc: email to all Users with selected Roles. Admin addressed emails can also get a Reply to address to the User. Account page user updated email address may get an email also to the old address.
+Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. 
+
+Additional CC: email addresses depending on a meta field value. Addition of cc: or Bcc: email to all Users with selected Roles. 
+
+Admin addressed emails can also get a Reply to address to the User. 
+
+Account page user updated email address may get an email also to the old address.
 
 ## UM Settings - All settings at each UM Settings -> Email -> Email template
 1. Additional Email Recipients - cc: - Comma separated e-mail adresses
