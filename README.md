@@ -40,6 +40,7 @@ Account page user updated email address may get an email also to the old address
 7. Version 3.1.0 Addition of cc: or Bcc: email to all Users with selected Roles.
 8. Version 3.2.0 Updated for UM 2.8.3
 9. Version 3.3.0 Addition of the UM Settings number 9 and 10.
+10. Version 3.3.1 Code improvements
 
 ## Installation
 1. Install by downloading the plugin ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
