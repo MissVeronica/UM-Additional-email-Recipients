@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Additional Email Recipients
  * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on meta field values.
- * Version:         3.3.0
+ * Version:         3.3.1
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -51,7 +51,7 @@ class UM_Additional_Email_Recipients {
 
     public function custom_email_notification_add_reply_to( $args ) {
 
-        if ( $args['to'] != um_user( 'user_email' ) && ! empty( um_user( 'user_email' ) )) {
+        if ( ! empty( um_user( 'user_email' ) ) && $args['to'] != um_user( 'user_email' ) ) {
             $args['headers'] .= 'Reply-To: ' . um_user( 'user_login' ) . ' <' . um_user( 'user_email' ) . ">\r\n";
         }
 
@@ -190,7 +190,7 @@ class UM_Additional_Email_Recipients {
     public function um_account_pre_update_profile_send_extra_email( $changes, $user_id ) {
 
         if ( UM()->options()->get( 'changedaccount_email_pre_update_profile' ) == 1 ) {
-            if ( um_user( 'user_email' ) != $changes['user_email'] && ! empty( um_user( 'user_email' ) )) {
+            if ( ! empty( um_user( 'user_email' ) ) && um_user( 'user_email' ) != $changes['user_email'] ) {
 
                 UM()->mail()->send( um_user( 'user_email' ), 'changedaccount_email' );
             }
@@ -226,7 +226,7 @@ class UM_Additional_Email_Recipients {
                     'type'          => 'text',
                     'size'          => 'small',
                     'label'         => __( 'Additional Email Recipients - Extra UM User email address', 'ultimate-member' ),
-                    'description'   => __( 'Extra e-mail address meta_key to be used instead of UM User email', 'ultimate-member' ),
+                    'description'   => __( 'Extra email address meta_key to be used instead of UM User email', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
                 );
 
@@ -234,7 +234,7 @@ class UM_Additional_Email_Recipients {
                     'id'            => $email_key . '_custom_replace_email_both',
                     'type'          => 'checkbox',
                     'label'         => __( 'Additional Email Recipients - Send to both Extra and UM User email address', 'ultimate-member' ),
-                    'description'   => __( 'Click to send to both Extra e-mail and UM User email address', 'ultimate-member' ),
+                    'description'   => __( 'Click to send to both Extra email and UM User email address', 'ultimate-member' ),
                     'conditional'   => array( $email_key . '_on', '=', 1 ),
                 );
 
@@ -329,5 +329,6 @@ class UM_Additional_Email_Recipients {
 }
 
 new UM_Additional_Email_Recipients();
+
 
 
