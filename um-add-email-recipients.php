@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Additional Email Recipients
  * Description:     Extension to Ultimate Member for additional CC: and BCC: to UM Notification Emails and replacement address for User email. Additional CC: email addresses depending on meta field values.
- * Version:         3.3.1
+ * Version:         3.3.2
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -189,10 +189,12 @@ class UM_Additional_Email_Recipients {
 
     public function um_account_pre_update_profile_send_extra_email( $changes, $user_id ) {
 
-        if ( UM()->options()->get( 'changedaccount_email_pre_update_profile' ) == 1 ) {
-            if ( ! empty( um_user( 'user_email' ) ) && um_user( 'user_email' ) != $changes['user_email'] ) {
+        if ( $_POST['_um_account_tab'] == 'general' ) {
+            if ( UM()->options()->get( 'changedaccount_email_pre_update_profile' ) == 1 ) {
+                if ( ! empty( um_user( 'user_email' ) ) && um_user( 'user_email' ) != $changes['user_email'] ) {
 
-                UM()->mail()->send( um_user( 'user_email' ), 'changedaccount_email' );
+                    UM()->mail()->send( um_user( 'user_email' ), 'changedaccount_email' );
+                }
             }
         }
     }
@@ -329,6 +331,3 @@ class UM_Additional_Email_Recipients {
 }
 
 new UM_Additional_Email_Recipients();
-
-
-
