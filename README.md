@@ -45,6 +45,6 @@ Account page user updated email address may get an email also to the old address
 12. Version 3.4.0 Support for UM 2.8.7/2.8.8 with the new WP All Users UI
 
 ## Installation & Updates
-1. Install and update by downloading the plugin ZIP file via green button
+1. Install and update by downloading the plugin ZIP file via green "Code" button
 2. Install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
 3. Activate the Plugin: Ultimate Member - Additional Email Recipients
